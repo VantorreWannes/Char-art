@@ -7,12 +7,12 @@ use rusttype::{Font, Scale};
 pub const PRINTABLE_CHARACTERS: &str = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct AverageKeyBrightnesses {
+pub struct KeyBrightnesses {
     keys: String,
     brightnesses: Vec<u8>,
 }
 
-impl AverageKeyBrightnesses {
+impl KeyBrightnesses {
     pub const KEY_REPETITION: u8 = 3;
     pub const KEY_WIDTH_MULTIPLIER: u8 = 2;
     pub const CHUNK_WIDTH_KEY_AMOUNT: usize =
@@ -66,7 +66,7 @@ impl AverageKeyBrightnesses {
         .unwrap()
     }
 
-    pub fn brightnesses(&self) -> &Vec<u8> {
+    pub fn brightnesses(&self) -> &[u8] {
         &self.brightnesses
     }
 
@@ -83,7 +83,7 @@ impl AverageKeyBrightnesses {
     }
 }
 
-impl Default for AverageKeyBrightnesses {
+impl Default for KeyBrightnesses {
     fn default() -> Self {
         let font_bytes = include_bytes!("/home/joknavi/.local/share/fonts/RobotoMono-Regular.ttf");
         Self::new(
@@ -94,8 +94,8 @@ impl Default for AverageKeyBrightnesses {
     }
 }
 
-impl From<&AverageKeyBrightnesses> for Vec<(u8, char)> {
-    fn from(average_key_brightnesses: &AverageKeyBrightnesses) -> Self {
+impl From<&KeyBrightnesses> for Vec<(u8, char)> {
+    fn from(average_key_brightnesses: &KeyBrightnesses) -> Self {
         average_key_brightnesses
             .brightnesses
             .iter()
@@ -106,19 +106,19 @@ impl From<&AverageKeyBrightnesses> for Vec<(u8, char)> {
     }
 }
 
-impl From<&AverageKeyBrightnesses> for HashMap<u8, char> {
-    fn from(average_key_brightnesses: &AverageKeyBrightnesses) -> Self {
+impl From<&KeyBrightnesses> for HashMap<u8, char> {
+    fn from(average_key_brightnesses: &KeyBrightnesses) -> Self {
         HashMap::from_iter(<Vec<(u8, char)>>::from(average_key_brightnesses).into_iter())
     }
 }
 
 #[cfg(test)]
-mod tests {
+mod key_brightnesses_tests {
     use std::collections::HashMap;
     use image::{GrayImage, Luma};
     use imageproc::{drawing::draw_filled_rect, rect::Rect};
     use rusttype::{Font, Scale};
-    use super::{AverageKeyBrightnesses, PRINTABLE_CHARACTERS};
+    use super::{KeyBrightnesses, PRINTABLE_CHARACTERS};
 
     fn get_font() -> Font<'static> {
         let font_bytes = include_bytes!("/home/joknavi/.local/share/fonts/RobotoMono-Regular.ttf");
@@ -130,23 +130,23 @@ mod tests {
         let bright_image = draw_filled_rect(
             &GrayImage::new(100, 100),
             Rect::at(0, 0).of_size(100, 100),
-            AverageKeyBrightnesses::KEY_COLOR,
+            KeyBrightnesses::KEY_COLOR,
         );
         let dark_image = draw_filled_rect(
             &GrayImage::new(100, 100),
             Rect::at(0, 0).of_size(100, 100),
             Luma([0]),
         );
-        assert_eq!(AverageKeyBrightnesses::average_brightness(&dark_image), 0);
+        assert_eq!(KeyBrightnesses::average_brightness(&dark_image), 0);
         assert_eq!(
-            AverageKeyBrightnesses::average_brightness(&bright_image),
+            KeyBrightnesses::average_brightness(&bright_image),
             255
         );
     }
 
     #[test]
     fn keys_average_brightnesses() {
-        let key_brightnesess = AverageKeyBrightnesses::keys_average_brightnesses(
+        let key_brightnesess = KeyBrightnesses::keys_average_brightnesses(
             PRINTABLE_CHARACTERS,
             get_font(),
             Scale::uniform(12.0),
@@ -158,9 +158,9 @@ mod tests {
         let scale = Scale::uniform(12.0);
         let font = get_font();
         let average_key_brightnesess =
-            AverageKeyBrightnesses::new(PRINTABLE_CHARACTERS, font.clone(), scale);
+            KeyBrightnesses::new(PRINTABLE_CHARACTERS, font.clone(), scale);
         let key_brightnesess =
-            AverageKeyBrightnesses::keys_average_brightnesses(PRINTABLE_CHARACTERS, font, scale);
+            KeyBrightnesses::keys_average_brightnesses(PRINTABLE_CHARACTERS, font, scale);
         assert_eq!(average_key_brightnesess.brightnesses, key_brightnesess);
     }
 
@@ -169,13 +169,13 @@ mod tests {
         let scale = Scale::uniform(12.0);
         let font = get_font();
         let average_key_brightnesess =
-            AverageKeyBrightnesses::new(PRINTABLE_CHARACTERS, font.clone(), scale);
-            assert_eq!(average_key_brightnesess, AverageKeyBrightnesses::default());
+            KeyBrightnesses::new(PRINTABLE_CHARACTERS, font.clone(), scale);
+            assert_eq!(average_key_brightnesess, KeyBrightnesses::default());
     }
 
     #[test]
     fn as_tuple() {
-        let average_key_brightnesess = AverageKeyBrightnesses::default();
+        let average_key_brightnesess = KeyBrightnesses::default();
         assert_eq!(
             <Vec<(u8, char)>>::from(&average_key_brightnesess)[0],
             (
@@ -187,7 +187,7 @@ mod tests {
 
     #[test]
     fn as_hash_map() {
-        let average_key_brightnesess = AverageKeyBrightnesses::default();
+        let average_key_brightnesess = KeyBrightnesses::default();
         let first_tuple = average_key_brightnesess.as_tuple()[0];
         let binding = <HashMap<u8, char>>::from(&average_key_brightnesess);
         let hash_map_tuple = binding.get_key_value(&first_tuple.0).unwrap();
