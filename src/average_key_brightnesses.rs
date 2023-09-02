@@ -151,7 +151,6 @@ mod tests {
             get_font(),
             Scale::uniform(12.0),
         );
-        dbg!(key_brightnesess);
     }
 
     #[test]
