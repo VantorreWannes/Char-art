@@ -5,6 +5,12 @@ use imageproc::drawing::{draw_text_mut, text_size};
 use rusttype::{Font, Scale};
 
 pub const PRINTABLE_CHARACTERS: &str = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+const DEFAULT_BRIGHTNESSES: [u8; 94] = [
+    22, 25, 59, 55, 48, 65, 13, 27, 28, 41, 34, 8, 15, 5, 23, 64, 33, 50, 50, 53, 53, 53, 38, 61,
+    55, 11, 13, 29, 33, 29, 34, 61, 53, 71, 46, 62, 56, 46, 57, 58, 48, 36, 60, 36, 75, 73, 56, 53,
+    57, 64, 55, 38, 52, 48, 79, 54, 41, 51, 35, 23, 35, 32, 12, 10, 49, 56, 37, 56, 47, 43, 54, 52,
+    39, 34, 53, 44, 61, 44, 43, 47, 48, 28, 42, 37, 42, 34, 52, 40, 38, 43, 32, 23, 32, 24,
+];
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct KeyBrightnesses {
@@ -85,12 +91,10 @@ impl KeyBrightnesses {
 
 impl Default for KeyBrightnesses {
     fn default() -> Self {
-        let font_bytes = include_bytes!("/home/joknavi/.local/share/fonts/RobotoMono-Regular.ttf");
-        Self::new(
-            PRINTABLE_CHARACTERS,
-            Font::try_from_bytes(font_bytes).unwrap(),
-            Scale::uniform(12.0),
-        )
+        Self {
+            keys: PRINTABLE_CHARACTERS.to_owned(),
+            brightnesses: DEFAULT_BRIGHTNESSES.to_vec(),
+        }
     }
 }
 
@@ -114,11 +118,11 @@ impl From<&KeyBrightnesses> for HashMap<u8, char> {
 
 #[cfg(test)]
 mod key_brightnesses_tests {
-    use std::collections::HashMap;
+    use super::{KeyBrightnesses, PRINTABLE_CHARACTERS};
     use image::{GrayImage, Luma};
     use imageproc::{drawing::draw_filled_rect, rect::Rect};
     use rusttype::{Font, Scale};
-    use super::{KeyBrightnesses, PRINTABLE_CHARACTERS};
+    use std::collections::HashMap;
 
     fn get_font() -> Font<'static> {
         let font_bytes = include_bytes!("/home/joknavi/.local/share/fonts/RobotoMono-Regular.ttf");
@@ -138,19 +142,7 @@ mod key_brightnesses_tests {
             Luma([0]),
         );
         assert_eq!(KeyBrightnesses::average_brightness(&dark_image), 0);
-        assert_eq!(
-            KeyBrightnesses::average_brightness(&bright_image),
-            255
-        );
-    }
-
-    #[test]
-    fn keys_average_brightnesses() {
-        let key_brightnesess = KeyBrightnesses::keys_average_brightnesses(
-            PRINTABLE_CHARACTERS,
-            get_font(),
-            Scale::uniform(12.0),
-        );
+        assert_eq!(KeyBrightnesses::average_brightness(&bright_image), 255);
     }
 
     #[test]
@@ -170,7 +162,7 @@ mod key_brightnesses_tests {
         let font = get_font();
         let average_key_brightnesess =
             KeyBrightnesses::new(PRINTABLE_CHARACTERS, font.clone(), scale);
-            assert_eq!(average_key_brightnesess, KeyBrightnesses::default());
+        assert_eq!(average_key_brightnesess, KeyBrightnesses::default());
     }
 
     #[test]
@@ -191,8 +183,6 @@ mod key_brightnesses_tests {
         let first_tuple = average_key_brightnesess.as_tuple()[0];
         let binding = <HashMap<u8, char>>::from(&average_key_brightnesess);
         let hash_map_tuple = binding.get_key_value(&first_tuple.0).unwrap();
-        assert_eq!(
-            hash_map_tuple, (&first_tuple.0, &first_tuple.1)
-        )
+        assert_eq!(hash_map_tuple, (&first_tuple.0, &first_tuple.1))
     }
 }
