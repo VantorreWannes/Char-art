@@ -19,10 +19,10 @@ fn main() -> Result<(), image::ImageError> {
             arg!(-b --brighten <i32> "Amount to brighten the image by.")
                 .value_parser(value_parser!(i32)),
         ])
-        .subcommand(Command::new("output").args(&[
-            arg!(-o --output <Path> "Output file.").required(true),
-            arg!(-f --font <Path> "Font file.").value_parser(value_parser!(String)),
-            arg!(-s --scale <f32> "Scale factor.").value_parser(value_parser!(f32)),
+        .subcommand(Command::new("to_image").args(&[
+            arg!(-p --path <Path> "Output file path.").required(true),
+            arg!(-f --font <Path> "Font .ttf file.").value_parser(value_parser!(String)),
+            arg!(-s --size <f32> "Font size.").value_parser(value_parser!(f32)),
         ]));
 
     let matches = cmd.get_matches();
@@ -47,10 +47,10 @@ fn main() -> Result<(), image::ImageError> {
     }
     let keys = image.as_keys(&KeyBrightnesses::default()).unwrap();
 
-    if let Some(output) = matches.subcommand_matches("output") {
-        let output_path = output.get_one::<String>("output");
+    if let Some(output) = matches.subcommand_matches("to_image") {
+        let output_path = output.get_one::<String>("path");
         let font_path = output.get_one::<String>("font");
-        let scale = output.get_one::<f32>("scale");
+        let size = output.get_one::<f32>("size");
 
         let font_bytes = match font_path {
             Some(path) => fs::read(path)?,
@@ -58,7 +58,7 @@ fn main() -> Result<(), image::ImageError> {
                 include_bytes!("/home/joknavi/.local/share/fonts/RobotoMono-Regular.ttf").to_vec()
             }
         };
-        let scale = match scale {
+        let scale = match size {
             Some(amount) => Scale::uniform(*amount),
             None => Scale::uniform(12.0),
         };
