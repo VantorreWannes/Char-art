@@ -1,5 +1,7 @@
 use crate::average_key_brightnesses::KeyBrightnesses;
-use image::{imageops::resize, DynamicImage, GrayImage};
+use image::{imageops::resize, DynamicImage, GrayImage, Luma};
+use imageproc::drawing::{draw_text_mut, text_size};
+use rusttype::{Font, Scale};
 
 pub trait ImageToKeys {
     fn closest_brightness(vector: &[u8], input: u8) -> Option<u8> {
@@ -43,10 +45,33 @@ impl ImageToKeys for DynamicImage {
     }
 }
 
+pub fn keys_to_image(keys: &[String], font: Font, scale: Scale) -> Result<GrayImage, String> {
+    const KEY_COLOR: Luma<u8> = Luma([255]);
+    let (image_row_width, image_row_height) = text_size(
+        scale,
+        &font,
+        keys.get(0).ok_or("The keys vector is empty.")?,
+    );
+    let mut image = GrayImage::new(
+        image_row_width as u32,
+        image_row_height as u32 * <u32>::try_from(keys.len()).unwrap(),
+    );
+    for (y, key) in keys.iter().enumerate() {
+        draw_text_mut(
+            &mut image,
+            KEY_COLOR,
+            0,
+            y as i32 * image_row_height,
+            scale,
+            &font,
+            key,
+        );
+    }
+    Ok(image)
+}
+
 #[cfg(test)]
 mod image_to_keys_tests {
-    use image::{imageops::FilterType, io::Reader};
-
     use super::*;
 
     #[test]
