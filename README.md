@@ -1,2 +1,2 @@
-# character_images
-Convert grayscale images to text characters
+# Key art
+Convert images to text characters (and back to images)
