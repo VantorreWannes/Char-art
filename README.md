@@ -14,3 +14,39 @@ Options you've set in the main `.\key_art.exe --path <path_to_image>` command wi
 Set the output image's font by using the `--font <path_to_font.ttf>` and set the font size by using `--size <f32>`. <br>
 If you would like a refresher on these parameters and commands you can give `--help` as an option after any command to print a quick overview of the command and its options. <br>
 Have fun! `Feel free to send me any suggestions/bugs/tips that you want me to look at on discord or via a PR on github.` <br>
+
+
+![minecraft](https://github.com/JokNavi/key_art/assets/109341383/d5631204-c3ac-47e3-9a48-afa8b7105ef0)
+![key_image](https://github.com/JokNavi/key_art/assets/109341383/9b2a14be-d324-4a6c-93ab-b6dacf260cd5)
+
+```
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWBwL|--;:,,,,,:;-~uRWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWMz!,.....,`:___:`,.....,|mWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWd!.....:-!|"((rrr(("~!-_,...!WWWWWWWWWWWWWWWW
+WWWWWWWWW&!....,-!|~~"""(rr>>>>>>r(~-...;BWWWWWWWWWWWWWW
+WWWWWWWWu,............,,`;-!"r>>>>>>(-...-WWWWWWWWWWWWWW
+WWWWMt-,,,;-!!!!-----;;`,...,;!r>>>>r|`...>WWWWWWWWWWWWW
+WWWv,.!SWWWWWWWWWWWWWWWWMk|....-(>>>>";...,MWWWWWWWWWWWW
+WW(..(WWWWWWWWWWWWWWWWWWWWMt,...!r>>>"-,...>WWWWWWWWWWWW
+W&,.,&WWWWWWWWWWWWWWWWWWWWWSr...;(>>>"-:....!>Yw&WWWWWWW
+Wz..,BWWWWWWWWWWWWWWWWWWWWRSL..._">>>(-_.........,;rBWWW
+WZ...FWWWWWWWWWWWWWWWWWNR#Qk>...;(>>>(-;,....-!!-:..;WWW
+WW-..-uSD&&BBMMMBB&&DKHQQdwt`...!r>>>(!;,...,|"""~;..uWW
+WWW"..,-rtzp3wkgSSSggkZanL!,...:">>>>(!;`....;----;..-WW
+WWWWr.....,`;-!!~~~~!!-_,.....;~r>>>>(-;`....:;;;;`..`WW
+WWWWL...,,................,_-|(>>>>>>(-;`....`;;;;`..,RW
+WWWW"..,|"~|!!--------!!!~"(r>>>>>>>>"-;`....`;;;;:...yW
+WWWW!..,">>>>>>>rrrrr>>>>>>>>>>>>>>>r~-;`....`;;;;:...!W
+WWWW-..,|>>>>>>>>>>>>>>>>>>>>>>>>>>>(!;;`....:;;;;:...;W
+WWWW-...-(>>>>>>>>>>>>>>>>>>>>>>>>>r~-;;`....:;;;;:...;W
+WWWW!...;!(>>>>>>>>>>>>>>>>>>>>>>>r"-;;;`....:;;;;:...;W
+WWWWr...:-!(>>>>>>>>>>>>>>>>>>>>r(|-;;;;,....:;;;;`...-W
+WWWWz...,;-!|"r>>>>>>>>>>>>>>r("!--;;;;;,....:;;;;`...}W
+WWWW&,..,_;;--!!~"""(((""""~!!--;;;;;;;;,....:;;;_,...RW
+WWWWW:...:;;;;;;;----------;;;;;;;;;;;;_,....:;;;`...-WW
+WWWWW-...:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;_,....:;;:....nWW
+```
+
