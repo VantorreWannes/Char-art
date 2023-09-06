@@ -1,5 +1,6 @@
+use brightness_char_map::BrightnessCharMap;
 pub mod brightness_char_map;
 
 fn main() {
-    println!("Hello, world!");
+    let char_map = BrightnessCharMap::default();
 }
