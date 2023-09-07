@@ -19,7 +19,7 @@ pub struct BrightnessCharMap {
 }
 
 impl BrightnessCharMap {
-    #[allow(dead_code)]
+
     fn new() -> BrightnessCharMap {
         let brightnesses_tuples = Self::get_brightness_tuples();
         Self {
@@ -27,7 +27,6 @@ impl BrightnessCharMap {
         }
     }
 
-    #[allow(dead_code)]
     fn get_brightness_tuples() -> [(char, u8); CHARS_LENGTH] {
         let mut brightnesses = [(' ', u8::MIN); CHARS.len()];
         let font = Font::try_from_bytes(FONT).unwrap();
@@ -43,7 +42,6 @@ impl BrightnessCharMap {
         brightnesses
     }
 
-    #[allow(dead_code)]
     fn average_brightness(glyph: ScaledGlyph) -> u8 {
         let mut buffer = [u32::MIN; 32];
         let total_pixels = Self::glyph_width(&glyph) * SCALE;
@@ -59,7 +57,6 @@ impl BrightnessCharMap {
         ((brightness as f32 * COLOR) / total_pixels) as u8
     }
 
-    #[allow(dead_code)]
     fn glyph_width(glyph: &ScaledGlyph) -> f32 {
         let h_metrics = glyph.h_metrics();
         h_metrics.advance_width + h_metrics.left_side_bearing
@@ -103,6 +100,13 @@ impl BrightnessCharMap {
     
         lut
     }
+
+
+    /// can't fail if self.char_lut is length 255 or longer.
+    ///  Which it always is.
+    pub unsafe fn get_unchecked(&self, brigthness: u8) -> char {
+        *self.char_lut.get_unchecked(brigthness as usize)
+    }
 }
 
 impl Default for BrightnessCharMap {
@@ -111,10 +115,10 @@ impl Default for BrightnessCharMap {
     }
 }
 
-impl Index<u8> for BrightnessCharMap {
+impl Index<usize> for BrightnessCharMap {
     type Output = char;
-    fn index(&self, index: u8) -> &Self::Output {
-        &self.char_lut[index as usize]
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.char_lut[index]
     }
 }
 
