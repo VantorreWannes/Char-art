@@ -1,10 +1,28 @@
-use image::{imageops::resize, DynamicImage, GrayImage};
-
 use crate::brightness_char_map::BrightnessCharMap;
+use image::{imageops::resize, DynamicImage, GrayImage, Luma};
+use imageproc::drawing::{draw_text_mut, text_size};
+use rusttype::{Font, Scale};
 
 pub trait AsChars {
     const HEIGHT_SHRINK_AMOUNT: u32;
     fn as_chars(&self, char_map: &BrightnessCharMap) -> String;
+    fn as_chars_image(chars: &str, font: &Font, scale: Scale) -> GrayImage {
+        let rows = chars.split('\n').collect::<Vec<&str>>();
+        let text_size = text_size(scale, font, &rows[0]);
+        let mut image = GrayImage::new(text_size.0 as u32, text_size.1 as u32 * rows.len() as u32);
+        for (y, line) in rows.iter().enumerate() {
+            draw_text_mut(
+                &mut image,
+                Luma([255]),
+                0,
+                text_size.1 * y as i32,
+                scale,
+                font,
+                line,
+            )
+        }
+        image
+    }
 }
 
 impl AsChars for GrayImage {
@@ -18,9 +36,8 @@ impl AsChars for GrayImage {
             image::imageops::FilterType::Lanczos3,
         );
 
-        
         let image_width = image.width() as usize;
-        let mut char_image = String::with_capacity(image.len() + image.height() as usize+2);
+        let mut char_image = String::with_capacity(image.len() + image.height() as usize + 2);
         for (index, brightness) in image.iter().enumerate() {
             unsafe {
                 char_image.push(char_map.get_unchecked(*brightness));
