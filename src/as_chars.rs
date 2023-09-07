@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use image::{imageops::resize, DynamicImage, GrayImage};
 
 use crate::brightness_char_map::BrightnessCharMap;
@@ -32,27 +30,6 @@ impl AsChars for GrayImage {
             }
         }
         char_image
-
-        /*
-        let total_pixels = image.len() + image.height() as usize;
-        let mut char_image = vec!['\x00'; total_pixels - 1];
-        let mut index = 0;
-        let mut newline_amount = 0;
-        while (index + image.height() as usize) < total_pixels {
-            unsafe {
-                let pixel = image.get_unchecked(index);
-                *char_image.get_unchecked_mut(index + newline_amount) =
-                    char_map.get_unchecked(*pixel);
-                if (index + 1) % (image.width() as usize) == 0 {
-                    *char_image.get_unchecked_mut(index + newline_amount) = '\n';
-                    newline_amount += 1;
-                }
-                index += 1;
-            }
-        }
-
-        String::from_iter(char_image)
-         */
     }
 }
 

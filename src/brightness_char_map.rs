@@ -101,9 +101,9 @@ impl BrightnessCharMap {
         lut
     }
 
-
-    /// can't fail if self.char_lut is length 255 or longer.
-    ///  Which it always is.
+    ///# Safety
+    ///Can't fail if self.char_lut is length 255 or longer.
+    ///Which it always is.
     pub unsafe fn get_unchecked(&self, brigthness: u8) -> char {
         *self.char_lut.get_unchecked(brigthness as usize)
     }
@@ -128,6 +128,6 @@ mod brightness_char_map_tests {
 
     #[test]
     fn get_brightness_tuples() {
-        let char_map = BrightnessCharMap::default();
+        let _char_map = BrightnessCharMap::default();
     }
 }
