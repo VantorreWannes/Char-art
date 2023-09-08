@@ -12,7 +12,7 @@ pub mod brightness_char_map;
 fn get_matches() -> ArgMatches {
     Command::new("char_art")
         .args(&[
-            arg!(-i --image <Path> "Input image path")
+            arg!(-p --path <Path> "Input image path")
                 .required(true)
                 .value_parser(value_parser!(String)),
             arg!(-s --shrink [u32] "Resize divide amount").value_parser(value_parser!(u32)),
@@ -23,7 +23,7 @@ fn get_matches() -> ArgMatches {
             Command::new("to_image")
                 .about("Convert the converted image back into an image.")
                 .args(&[
-                    arg!(-i --image <Path> "output image path")
+                    arg!(-p --path <Path> "output image path")
                         .required(true)
                         .value_parser(value_parser!(String)),
                     arg!(-f --font [Path] "Font path").value_parser(value_parser!(String)),
@@ -34,7 +34,7 @@ fn get_matches() -> ArgMatches {
 }
 
 fn get_path(matches: &ArgMatches) -> Result<String, image::ImageError> {
-    match matches.get_one::<String>("image") {
+    match matches.get_one::<String>("path") {
         Some(path) => Ok(path.to_string()),
         None => Err(image::ImageError::IoError(io::Error::from(
             io::ErrorKind::NotFound,
