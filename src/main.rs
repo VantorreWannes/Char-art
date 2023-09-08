@@ -1,10 +1,9 @@
-use std::{
-    fs::{self, File},
-    io,
-};
+use std::{fs, io};
 
-use clap::{arg, value_parser, Arg, ArgMatches, Command};
-use image::{imageops::FilterType, io::Reader, DynamicImage};
+use as_chars::{as_chars_image, AsChars};
+use brightness_char_map::BrightnessCharMap;
+use clap::{arg, value_parser, ArgMatches, Command};
+use image::{imageops::FilterType, io::Reader, DynamicImage, GrayImage};
 use rusttype::{Font, Scale};
 
 pub mod as_chars;
@@ -84,16 +83,15 @@ fn get_scale(matches: &ArgMatches) -> Result<Scale, image::ImageError> {
     }
 }
 
-fn handle_sub_matches<'a>(
-    image: &'a mut DynamicImage,
+fn get_chars_image<'a>(
+    chars: &'a str,
     sub_matches: &'a ArgMatches,
-) -> Result<DynamicImage, image::ImageError> {
-    let path = get_path(sub_matches)?;
+) -> Result<GrayImage, image::ImageError> {
     let font = Font::try_from_vec(get_font(sub_matches)?)
         .ok_or(io::Error::from(io::ErrorKind::NotFound))?;
     let scale = get_scale(sub_matches)?;
 
-    Ok(())
+    Ok(as_chars_image(chars, &font, scale))
 }
 
 fn main() -> Result<(), image::ImageError> {
@@ -103,8 +101,15 @@ fn main() -> Result<(), image::ImageError> {
     image = shrink_image(image, matches.get_one::<u32>("shrink"));
     image = darken_image(image, matches.get_one::<i32>("darken"));
 
-    if let Some(sub_matches) = matches.subcommand_matches("to_image") { 
-        handle_sub_matches(&mut image, sub_matches)?;
+    let char_map = BrightnessCharMap::default();
+    let chars = image.as_chars(&char_map);
+
+    if let Some(sub_matches) = matches.subcommand_matches("to_image") {
+        let char_image = get_chars_image(&chars, sub_matches)?;
+        let path = get_path(sub_matches)?;
+        char_image.save(&path)?;
+    } else {
+        println!("{}", chars);
     }
 
     Ok(())

@@ -6,23 +6,6 @@ use rusttype::{Font, Scale};
 pub trait AsChars {
     const HEIGHT_SHRINK_AMOUNT: u32;
     fn as_chars(&self, char_map: &BrightnessCharMap) -> String;
-    fn as_chars_image(chars: &str, font: &Font, scale: Scale) -> GrayImage {
-        let rows = chars.split('\n').collect::<Vec<&str>>();
-        let text_size = text_size(scale, font, &rows[0]);
-        let mut image = GrayImage::new(text_size.0 as u32, text_size.1 as u32 * rows.len() as u32);
-        for (y, line) in rows.iter().enumerate() {
-            draw_text_mut(
-                &mut image,
-                Luma([255]),
-                0,
-                text_size.1 * y as i32,
-                scale,
-                font,
-                line,
-            )
-        }
-        image
-    }
 }
 
 impl AsChars for GrayImage {
@@ -56,6 +39,24 @@ impl AsChars for DynamicImage {
     fn as_chars(&self, char_map: &BrightnessCharMap) -> String {
         self.to_luma8().as_chars(char_map)
     }
+}
+
+pub fn as_chars_image(chars: &str, font: &Font, scale: Scale) -> GrayImage {
+    let rows = chars.split('\n').collect::<Vec<&str>>();
+    let text_size = text_size(scale, font, rows[0]);
+    let mut image = GrayImage::new(text_size.0 as u32, text_size.1 as u32 * rows.len() as u32);
+    for (y, line) in rows.iter().enumerate() {
+        draw_text_mut(
+            &mut image,
+            Luma([255]),
+            0,
+            text_size.1 * y as i32,
+            scale,
+            font,
+            line,
+        )
+    }
+    image
 }
 
 #[cfg(test)]
