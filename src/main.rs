@@ -1,5 +1,5 @@
-pub mod map_char_brightnesses;
-
+pub mod char_brightnesses;
+pub mod as_string;
 fn main() {
     
 }

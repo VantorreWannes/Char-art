@@ -3,7 +3,7 @@ extern crate test;
 
 #[cfg(test)]
 mod benchmarks {
-    use char_art::map_char_brightnesses::CharBrightnesses;
+    use char_art::char_brightnesses::CharBrightnesses;
     use image::Luma;
     use rusttype::{Font, Scale};
     use test::{Bencher, black_box};
