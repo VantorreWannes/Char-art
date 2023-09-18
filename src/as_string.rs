@@ -1,6 +1,8 @@
 use crate::char_brightnesses::CharBrightnesses;
 use fast_image_resize::{FilterType, Image, PixelType, ResizeAlg, Resizer};
-use image::{io::Reader, DynamicImage, GenericImageView, GrayImage};
+use image::{io::Reader, DynamicImage, GenericImageView, GrayImage, Luma};
+use imageproc::drawing::{text_size, draw_text_mut};
+use rusttype::{Font, Scale};
 use std::num::NonZeroU32;
 
 pub trait AsString {
@@ -53,6 +55,24 @@ impl AsString for DynamicImage {
     fn as_string(&self, char_brightnesses_lut: &CharBrightnesses) -> String {
         self.to_luma8().as_string(char_brightnesses_lut)
     }
+}
+
+pub fn string_to_image(chars: &str, font: &Font, scale: Scale) -> GrayImage {
+    let rows = chars.split('\n').collect::<Vec<&str>>();
+    let text_size = text_size(scale, font, rows[0]);
+    let mut image = GrayImage::new(text_size.0 as u32, text_size.1 as u32 * rows.len() as u32);
+    for (y, line) in rows.iter().enumerate() {
+        draw_text_mut(
+            &mut image,
+            Luma([255]),
+            0,
+            text_size.1 * y as i32,
+            scale,
+            font,
+            line,
+        )
+    }
+    image
 }
 
 #[cfg(test)]
