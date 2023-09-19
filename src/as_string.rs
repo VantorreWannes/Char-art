@@ -1,53 +1,59 @@
 use crate::char_brightnesses::CharBrightnesses;
 use fast_image_resize::{FilterType, Image, PixelType, ResizeAlg, Resizer};
 use image::{io::Reader, DynamicImage, GenericImageView, GrayImage, Luma};
-use imageproc::drawing::{text_size, draw_text_mut};
+use imageproc::drawing::{draw_text_mut, text_size};
 use rusttype::{Font, Scale};
 use std::num::NonZeroU32;
 
 pub trait AsString {
     const HEIGHT_SHRINK_AMOUNT: u8;
     fn as_string(&self, char_brightnesses_lut: &CharBrightnesses) -> String;
-}
-
-impl AsString for GrayImage {
-    const HEIGHT_SHRINK_AMOUNT: u8 = 2;
-
-    fn as_string(&self, char_brightnesses_lut: &CharBrightnesses) -> String {
-        let self_width = self.width();
-        let self_height = self.height();
-        let source_image = Image::from_vec_u8(
-            NonZeroU32::new(self_width).unwrap(),
-            NonZeroU32::new(self_height).unwrap(),
-            self.clone().into_raw(),
-            PixelType::U8,
-        )
-        .unwrap();
-
+    fn fast_resize<'a>(image: Image<'a >, dimensions: (u32, u32)) -> Option<Image<'a>> {
         let mut target_image = Image::new(
-            NonZeroU32::new(self_width).unwrap(),
-            NonZeroU32::new(self_height / Self::HEIGHT_SHRINK_AMOUNT as u32).unwrap(),
-            source_image.pixel_type(),
+            NonZeroU32::new(dimensions.0)?,
+            NonZeroU32::new(dimensions.1)?,
+            image.pixel_type(),
         );
 
         let mut resizer = Resizer::new(fast_image_resize::ResizeAlg::Convolution(
             FilterType::Lanczos3,
         ));
         resizer
-            .resize(&source_image.view(), &mut target_image.view_mut())
-            .unwrap();
+            .resize(&image.view(), &mut target_image.view_mut())
+            .ok()?;
+        Some(target_image)
+    }
+}
 
-        let image_bytes = target_image.buffer();
+impl AsString for GrayImage {
+    const HEIGHT_SHRINK_AMOUNT: u8 = 2;
+
+    fn as_string(&self, char_brightnesses_lut: &CharBrightnesses) -> String {
+        let width = self.width();
+        let height = self.height();
+
+        let image = Image::from_vec_u8(
+            NonZeroU32::new(width).unwrap(),
+            NonZeroU32::new(height).unwrap(),
+            self.clone().into_raw(),
+            PixelType::U8,
+        )
+        .unwrap();
+
+        let resized_image = Self::fast_resize(image,(width, height/Self::HEIGHT_SHRINK_AMOUNT as u32)).unwrap();
+        let image_bytes = resized_image.buffer();
         let mut char_buffer =
-            String::with_capacity(image_bytes.len() + self_height as usize / 2 + 2);
+            String::with_capacity(image_bytes.len() + height as usize / 2 + 2);
         for index in 0..image_bytes.len() {
             char_buffer.push(char_brightnesses_lut[image_bytes[index]]);
-            if (index + 1) % self_width as usize == 0 {
+            if (index + 1) % width as usize == 0 {
                 char_buffer.push('\n');
             }
         }
         char_buffer
     }
+
+    
 }
 
 impl AsString for DynamicImage {
