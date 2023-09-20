@@ -3,18 +3,17 @@ use std::ops::Index;
 use image::Luma;
 use rusttype::{point, Font, Scale, ScaledGlyph};
 
+use crate::mark_up_options::MarkUpOptions;
+
 #[derive(Debug)]
 pub struct CharBrightnesses {
     char_lut: [char; u8::MAX as usize],
 }
 
-// const FONT: &[u8] = include_bytes!("/home/joknavi/.local/share/fonts/RobotoMono-Regular.ttf");
-// const SCALE: f32 = 40.0;
-// const COLOR: f32 = u8::MAX as f32;
-
 impl CharBrightnesses {
-    pub fn new(chars: &str, font: &Font, scale: &Scale, color: &Luma<u8>) -> Self {
-        let brightnesses_tuples = Self::get_brightness_tuples(chars, font, scale, color);
+    pub fn new(chars: &str, options: &MarkUpOptions) -> Self {
+        let (font, scale, color) = options.get_values();
+        let brightnesses_tuples = Self::get_brightness_tuples(chars, &font, &scale, &color);
         CharBrightnesses {
             char_lut: Self::brightness_tuples_to_lut(brightnesses_tuples),
         }
@@ -130,14 +129,14 @@ impl Default for CharBrightnesses {
 impl Index<u8> for CharBrightnesses {
     type Output = char;
     fn index(&self, index: u8) -> &Self::Output {
-        unsafe {
-            &self.char_lut.get_unchecked(index as usize)
-        }
+        unsafe { &self.char_lut.get_unchecked(index as usize) }
     }
 }
 
 #[cfg(test)]
 mod char_brightnesses_tests {
+    use crate::mark_up_options::MarkUpOptions;
+
     use super::CharBrightnesses;
     use image::Luma;
     use rusttype::{Font, Scale};
@@ -212,7 +211,7 @@ mod char_brightnesses_tests {
         let font = Font::try_from_bytes(font_bytes).unwrap();
         let scale = Scale::uniform(12.0);
         let color = Luma([255]);
-        let char_brightnesses = CharBrightnesses::new(chars, &font, &scale, &color);
+        let char_brightnesses = CharBrightnesses::new(chars, &MarkUpOptions::default());
         dbg!(char_brightnesses);
     }
 
@@ -222,6 +221,5 @@ mod char_brightnesses_tests {
         for i in 0..=255u8 {
             char_brightnesses[i];
         }
-
     }
 }

@@ -6,7 +6,7 @@ mod benchmarks {
     use std::num::NonZeroU32;
 
     use super::*;
-    use char_art::{as_string::AsString, char_brightnesses::CharBrightnesses};
+    use char_art::{as_string::AsString, char_brightnesses::CharBrightnesses, as_string_options::AsStringOptions};
     use fast_image_resize::{FilterType, Image, PixelType, Resizer};
     use image::{imageops::resize, io::Reader, GrayImage, Luma};
     use rusttype::{Font, Scale};
@@ -117,8 +117,9 @@ mod benchmarks {
             .decode()
             .unwrap()
             .to_luma8();
+        let as_string_options = AsStringOptions::default();
         b.iter(|| {
-            black_box(&image).as_string(black_box(&char_map));
+            black_box(&image).as_string(black_box(&char_map), black_box(&as_string_options));
         });
     }
 
