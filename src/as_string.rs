@@ -26,20 +26,21 @@ impl AsString for GrayImage {
         options: &AsStringOptions,
     ) -> String {
         let (shrink, darken) = options.get_values();
-        let width = self.width();
-        let height = self.height();
 
         let image = Image::from_vec_u8(
-            NonZeroU32::new(width).unwrap(),
-            NonZeroU32::new(height).unwrap(),
+            NonZeroU32::new(self.width()).unwrap(),
+            NonZeroU32::new(self.height()).unwrap(),
             self.clone().into_raw(),
             PixelType::U8,
         )
         .unwrap();
 
+        let width = self.width() / shrink;
+        let height = self.height() / shrink;
+
         let mut target_image = Image::new(
-            NonZeroU32::new(width / shrink).unwrap(),
-            NonZeroU32::new((height / shrink) / Self::HEIGHT_SHRINK_AMOUNT as u32).unwrap(),
+            NonZeroU32::new(width).unwrap(),
+            NonZeroU32::new(height / (Self::HEIGHT_SHRINK_AMOUNT as u32)).unwrap(),
             image.pixel_type(),
         );
 
@@ -53,7 +54,7 @@ impl AsString for GrayImage {
 
         let image_bytes = target_image.buffer();
         let mut char_buffer = String::with_capacity(
-            image_bytes.len() + ((height / shrink) as usize / Self::HEIGHT_SHRINK_AMOUNT as usize),
+            image_bytes.len() + (height as usize / Self::HEIGHT_SHRINK_AMOUNT as usize),
         );
         dbg!(char_buffer.capacity());
         for index in 0..image_bytes.len() {
@@ -84,6 +85,7 @@ pub fn string_to_image(chars: &str, options: &MarkUpOptions) -> GrayImage {
     let text_size = text_size(scale, &font, rows[0]);
     let mut image = GrayImage::new(text_size.0 as u32, text_size.1 as u32 * rows.len() as u32);
     for (y, line) in rows.iter().enumerate() {
+        dbg!(line.len());
         draw_text_mut(
             &mut image,
             color,
@@ -113,5 +115,23 @@ mod as_string_tests {
             .to_luma8()
             .as_string(&char_map, &AsStringOptions::default());
         fs::write("io/output/text_doggo.txt", image_text).unwrap();
+    }
+
+    #[test]
+    fn as_string_custom() {
+        let chars = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+
+        let markup_options = MarkUpOptions::default();
+        let string_options = AsStringOptions::new().set_shrink(2);
+        let char_brightnesses = CharBrightnesses::new(chars, &markup_options);
+
+        let source_image = Reader::open("io/output/smol_box_doggo.jpg")
+            .unwrap()
+            .decode()
+            .unwrap();
+
+        let image_text = source_image.as_string(&char_brightnesses, &string_options);
+        let target_image = string_to_image(&image_text, &markup_options);
+        target_image.save("io/output/doggo_text.jpg").unwrap();
     }
 }

@@ -12,6 +12,9 @@ pub struct CharBrightnesses {
 
 impl CharBrightnesses {
     pub fn new(chars: &str, options: &MarkUpOptions) -> Self {
+        if chars.contains("\n") {
+            panic!("chars cannot contain any newlines.");
+        }
         let (font, scale, color) = options.get_values();
         let brightnesses_tuples = Self::get_brightness_tuples(chars, &font, &scale, &color);
         CharBrightnesses {
